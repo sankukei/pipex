@@ -36,8 +36,8 @@ int	main(int ac, char **av)
 		{
 			if ((av[2][i] >> i) & 1)
 				kill(atoi(av[1]), SIGUSR1);
-		//	else
-		//		kill(atoi(av[1]), SIGUSR2);
+			else
+				kill(atoi(av[1]), SIGUSR2);
 			pause();
 			i++;
 		}
