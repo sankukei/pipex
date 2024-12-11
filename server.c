@@ -66,7 +66,15 @@ char	*ft_itoa(int nb)
 
 void	print_signal(int signal)
 {
-	printf("SIGNAL RECEIVED %d\n", signal);
+	while (1)
+	{
+		write(1, "a", 1);
+		if (signal == 10)
+			printf("SIGUSR1 RECEIVED");
+		else
+			printf("SIGUSR2 RECEIVED");
+		pause();
+	}
 }
 
 void	pr(char *str)
