@@ -64,15 +64,30 @@ char	*ft_itoa(int nb)
 	return (res);
 }
 
+void	xd(char*str)
+{
+	while (*str)
+		write(1, str++, 1);
+}
+
 static void	print_signal(int signal, siginfo_t * info, void *context)
 {
 
 	if (signal == 10)
 	{
-		printf("SIGUSR1 RECEIVED [%d]\n", info->si_pid);
+		//printf("SIGUSR1 RECEIVED [%d]\n", info->si_pid);
+		xd("SIGUSR1 RECEIVED [");
+		xd(ft_itoa(info->si_pid));
+		xd("]\n");
+		kill(info->si_pid, SIGUSR1);
 	}
 	else
-		printf("SIGUSR2 RECEIVED [%d]", info->si_pid);
+	{
+		xd("SIGUSR2 RECEIVED [");
+		xd(ft_itoa(info->si_pid));
+		xd("]\n");
+		kill(info->si_pid, SIGUSR1);
+	}
 }
 
 void	pr(char *str)
@@ -95,7 +110,10 @@ int	main(void)
 	sigaction(SIGUSR1, &sig, NULL);
 	sigaction(SIGUSR2, &sig, NULL);
 	sig.sa_flags = SA_RESTART | SA_SIGINFO; 
-	ret = pause();
+	while (1)
+	{
+		ret = pause();
+	}
 	if (ret == -1)
 		printf("aurevoir\n");
 	return (0);

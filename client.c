@@ -25,11 +25,19 @@ int	ft_strlen(char *str)
 	return (i);
 }
 
+void	wow(int signal)
+{
+	write(1, "THANKS FOR RESPONSE", 21);
+}
+
 int	main(int ac, char **av)
 {
 	int	i;
 
 	i = 0;
+	struct sigaction sig;
+	sig.sa_handler = wow;
+	sigaction(SIGUSR1, &sig, NULL);
 	if (ac == 3)
 	{
 		while (i < 7)
