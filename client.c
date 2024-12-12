@@ -15,6 +15,8 @@
 #include <stdio.h>
 #include <unistd.h>
 
+volatile sig_atomic_t	wait_signal = 1;
+
 int	ft_strlen(char *str)
 {
 	int	i;
@@ -25,9 +27,10 @@ int	ft_strlen(char *str)
 	return (i);
 }
 
-void	wow(int signal)
+void	wow(int signal, siginfo_t * info, void *context)
 {
-	write(1, "THANKS FOR RESPONSE", 21);
+	wait_signal = 1;
+	write(1, "THANKS FOR RESPONSE\n", 21);
 }
 
 int	main(int ac, char **av)
@@ -36,17 +39,20 @@ int	main(int ac, char **av)
 
 	i = 0;
 	struct sigaction sig;
-	sig.sa_handler = wow;
+	sig.sa_sigaction = wow;
+	sig.sa_flags = 0;
 	sigaction(SIGUSR1, &sig, NULL);
 	if (ac == 3)
 	{
-		while (i < 7)
+		while (i < 8)
 		{
+			wait_signal = 0;
 			if ((av[2][i] >> i) & 1)
-				kill(atoi(av[1]), SIGUSR1);
-			else
 				kill(atoi(av[1]), SIGUSR2);
-			pause();
+			else
+				kill(atoi(av[1]), SIGUSR1);
+			while (!wait_signal)
+				;
 			i++;
 		}
 	}

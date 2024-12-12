@@ -16,6 +16,8 @@
 #include <signal.h>
 #include <stdlib.h>
 
+volatile int	wait_signal = 0;
+
 static int	ft_chackal(long n)
 {
 	int	i;
@@ -72,20 +74,22 @@ void	xd(char*str)
 
 static void	print_signal(int signal, siginfo_t * info, void *context)
 {
-
+	int	i;
+	char buff[7];
+	i = 0;
 	if (signal == 10)
 	{
 		//printf("SIGUSR1 RECEIVED [%d]\n", info->si_pid);
 		xd("SIGUSR1 RECEIVED [");
 		xd(ft_itoa(info->si_pid));
-		xd("]\n");
+		xd("] BINARY: 0\n");
 		kill(info->si_pid, SIGUSR1);
 	}
 	else
 	{
 		xd("SIGUSR2 RECEIVED [");
 		xd(ft_itoa(info->si_pid));
-		xd("]\n");
+		xd("] BINARY: 1\n");
 		kill(info->si_pid, SIGUSR1);
 	}
 }
@@ -94,6 +98,7 @@ void	pr(char *str)
 {
 	while (*str)
 		write(1, str++, 1);
+	write(1, "\n", 1);
 }
 
 int	main(void)
@@ -105,7 +110,6 @@ int	main(void)
 	pid = getpid();
 	char *tmp = ft_itoa(pid);
 	pr(tmp);
-	write(1, "\n", 1);
 	sig.sa_sigaction = print_signal;
 	sigaction(SIGUSR1, &sig, NULL);
 	sigaction(SIGUSR2, &sig, NULL);
