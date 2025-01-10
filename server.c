@@ -16,8 +16,9 @@
 #include <signal.h>
 #include <stdlib.h>
 
-volatile int	dingus = 1;
+volatile sig_atomic_t	wait_signal = 0;
 
+void	pr(char *str);
 static int	ft_chackal(long n)
 {
 	int	i;
@@ -76,7 +77,9 @@ static void	print_signal(int signal, siginfo_t * info, void *context)
 {
 	int	i;
 	i = 1;
-	if (signal == 10)
+	wait_signal = 1;
+	char	res[100];	
+/*	if (signal == 10)
 	{
 		//printf("SIGUSR1 RECEIVED [%d]\n", info->si_pid);
 		xd("SIGUSR1 RECEIVED [");
@@ -95,6 +98,25 @@ static void	print_signal(int signal, siginfo_t * info, void *context)
 		dingus++;
 	}
 	write(1, ft_itoa(dingus), 8);
+	*/
+	char static	count = 0;
+	if (signal == SIGUSR1)
+	{
+		wait_signal = 0;
+		write(1, "Entered signal handler\n", 23);
+		count++;
+		char *xd = ft_itoa(count);
+		write(1, xd, 1);
+		write(1, "\n", 1);
+		kill(info->si_pid, SIGUSR1);
+	} else
+	{
+		res[i] = count;
+		count = 0;
+		i++;
+	}
+	pr(res);
+
 }
 
 void	pr(char *str)
