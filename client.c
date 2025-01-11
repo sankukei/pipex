@@ -39,7 +39,7 @@ int	main(int ac, char **av)
 	int	w_char;
 	
 	i = 0;
-	count = 0;
+	count = 1;
 	w_char = 0;
 	struct sigaction sig;
 	sig.sa_sigaction = wow;
@@ -81,6 +81,9 @@ int	main(int ac, char **av)
 			i++;
 			count = 0;
 		}
+		kill(atoi(av[1]), SIGUSR2);
+	//	kill(atoi(av[1]), SIGUSR2);
+		write(1, "sent SIGUSR2", 12);
 
 	}
 	else

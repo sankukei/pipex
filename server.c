@@ -75,48 +75,33 @@ void	xd(char*str)
 
 static void	print_signal(int signal, siginfo_t * info, void *context)
 {
-	int	i;
-	i = 1;
-	wait_signal = 1;
 	char	res[100];	
-/*	if (signal == 10)
-	{
-		//printf("SIGUSR1 RECEIVED [%d]\n", info->si_pid);
-		xd("SIGUSR1 RECEIVED [");
-		xd(ft_itoa(info->si_pid));
-		xd("] BINARY: 0\n");
-		kill(info->si_pid, SIGUSR1);
-		dingus *= 10;
-	}
-	else
-	{
-		xd("SIGUSR2 RECEIVED [");
-		xd(ft_itoa(info->si_pid));
-		xd("] BINARY: 1\n");
-		kill(info->si_pid, SIGUSR1);
-		dingus *= 10;
-		dingus++;
-	}
-	write(1, ft_itoa(dingus), 8);
-	*/
 	char static	count = 0;
+	int static	i = 0;
+	int static	end = 0;
 	if (signal == SIGUSR1)
 	{
-		wait_signal = 0;
-		write(1, "Entered signal handler\n", 23);
 		count++;
-		char *xd = ft_itoa(count);
-		write(1, xd, 1);
-		write(1, "\n", 1);
+		end = 0;	
 		kill(info->si_pid, SIGUSR1);
 	} else
 	{
 		res[i] = count;
 		count = 0;
 		i++;
+		end++;
 	}
-	pr(res);
-
+	if (end == 2)
+	{
+		i++;
+		res[i] = '\0';
+		i = 0;
+		end = 0;
+		count = 0;
+		write(1, "RES:\n", 5);
+		pr(res);
+		return ;
+	}
 }
 
 void	pr(char *str)
