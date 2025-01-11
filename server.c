@@ -73,18 +73,31 @@ void	xd(char*str)
 		write(1, str++, 1);
 }
 
+void	flush(char *str)
+{
+	while (*str)
+	{
+		*str = '\0';
+		str++;
+	}
+}
+
+
 static void	print_signal(int signal, siginfo_t * info, void *context)
 {
-	char	res[100];	
-	char static	count = 0;
-	int static	i = 0;
-	int static	end = 0;
-	if (signal == SIGUSR1)
+	context = 0;
+	context++;
+	static char	res[100];	
+	static char	count = 0;
+	static int	i = 0;
+	static int	end = 0;
+	if (signal == SIGUSR1 && end != 2)
 	{
 		count++;
 		end = 0;	
 		kill(info->si_pid, SIGUSR1);
-	} else
+	}
+	if (signal == SIGUSR2 && end != 2)
 	{
 		res[i] = count;
 		count = 0;
@@ -93,6 +106,7 @@ static void	print_signal(int signal, siginfo_t * info, void *context)
 	}
 	if (end == 2)
 	{
+		i++;
 		i++;
 		res[i] = '\0';
 		i = 0;
@@ -113,7 +127,6 @@ void	pr(char *str)
 
 int	main(void)
 {
-	int	count = 0;
 	struct sigaction sig;
 	int	ret = 0;
 	pid_t	pid;

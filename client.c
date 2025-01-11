@@ -29,6 +29,12 @@ int	ft_strlen(char *str)
 
 void	wow(int signal, siginfo_t * info, void *context)
 {
+	signal = 0;
+	info = 0;
+	context = 0;
+	signal++;
+	info++;
+	context++;
 	wait_signal = 1;
 	write(1, "THANKS FOR RESPONSE\n", 21);
 }
@@ -36,54 +42,32 @@ int	main(int ac, char **av)
 {
 	int	i;
 	char	count;
-	int	w_char;
 	
 	i = 0;
-	count = 1;
-	w_char = 0;
+	count = 0;
 	struct sigaction sig;
 	sig.sa_sigaction = wow;
 	sig.sa_flags = 0;
 	sigaction(SIGUSR1, &sig, NULL);
 	if (ac == 3)
 	{
-/*		while  (i < 8)
-		{
-			wait_signal = 0;
-			if ((av[2][i] >> i) & 1)
-				kill(atoi(av[1]), SIGUSR2);
-			else
-				kill(atoi(av[1]), SIGUSR1);
-			while (!wait_signal)
-				;
-			i++;
-		}
-	}
-*/
 		while (av[2][i])
 		{
 			while (count != av[2][i])
 			{
 				wait_signal = 0;
-					kill(atoi(av[1]), SIGUSR1);
-				while (!wait_signal)
-				{
-					;
-				}
+				kill(atoi(av[1]), SIGUSR1);
 				count++;
+				while (!wait_signal)
+					;
 			}
 			kill(atoi(av[1]), SIGUSR2);
-			write(1, "sent SIGUSR2", 12);
-			if (w_char == 0)
-				w_char = 1;
-			else 
-				w_char = 0;
+			write(1, "sent SIGUSR2\n", 13);
 			i++;
 			count = 0;
 		}
 		kill(atoi(av[1]), SIGUSR2);
-	//	kill(atoi(av[1]), SIGUSR2);
-		write(1, "sent SIGUSR2", 12);
+		write(1, "sent SIGUSR2\n", 13);
 
 	}
 	else
