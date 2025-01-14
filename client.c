@@ -85,18 +85,13 @@ void	wow(int signal, siginfo_t * info, void *context)
 	info++;
 	context++;
 	wait_signal = 1;
-//	write(1, "THANKS FOR RESPONSE\n", 21);
 }
 int	main(int ac, char **av)
 {
 	int	i;
 	char	count;
-	int cint = 0;// le nombre de compte
-	char *tmp;
-	int pint = 0; // ca pr de passage de lettre 
 	
 	i = 0;
-	count = av[2][i];
 	struct sigaction sig;
 	sig.sa_sigaction = wow;
 	sig.sa_flags = 0;
@@ -105,37 +100,23 @@ int	main(int ac, char **av)
 	{
 		while (av[2][i])
 		{
-				
-			write(1, &count, 1);
+			count = av[2][i];
 			while (count--)
 			{
-					
-				cint++;
+				usleep(100);
 				wait_signal = 0;
 				kill(atoi(av[1]), SIGUSR1);
-				//count++;
 				while (!wait_signal)
 					;
 			}
+			usleep(100);
 			kill(atoi(av[1]), SIGUSR2);\
-			pint++;
-			write(1, "sent SIGUSR2\n", 13);
 			i++;
-			count = av[2][i];
 		}
+		usleep(100);
 		kill(atoi(av[1]), SIGUSR2);
-		write(1, "sent SIGUSR2\n", 13);
-
 	}
 	else
 		write(1, "ERROR: Need 2 parameters (pid, string to send)", 46);
-	tmp = ft_itoa(cint);
-	write(1, tmp, ft_strlen(tmp));
-	write(1, "\n", 1);
-	tmp = ft_itoa(pint);
-	write(1, tmp, ft_strlen(tmp));
-	write(1, "\n", 1);
-
-
 	return (0);
 }

@@ -97,49 +97,32 @@ int	ft_strlen(char *str)
 static void	print_signal(int signal, siginfo_t * info, void *context)
 {
 	(void)context;
-	//context++;
-	static char	res[100];	
+	static char	res[1000000] = {0};	
 	static char	count = 0;
 	static int	i = 0;
 	static int	end = 0;
-	char *tmp;
-	int x = 0;
-	while(x < 100)
-		res[x++] = '\0';
+
 	if (signal == SIGUSR1 && end != 2)
 	{
-		
-		write(1,"ff\n", 3);
 		count++;
 		end = 0;	
 		kill(info->si_pid, SIGUSR1);
 	}
 	if(signal == SIGUSR2 && end != 2)
 	{
-		write(1, "ff2\n", 4);
-		tmp = ft_itoa(count);
-		write(1, "COUNT:", 6);
-		write(1, tmp, ft_strlen(tmp));
-		write(1, "\n", 1);
 		res[i] = count;
-		write(1, "RES:", 4);
-		write(1, &res[i], 1);
-		write(1, "\n", 1);
 		count = 0;
 		i++;
 		end++;
 	}
 	if (end == 2)
 	{
-		//i++;
-		//i++;
-		//res[i] = '\0';
-		write(1, res, ft_strlen(res));
+		res[i] = '\0';
 		i = 0;
 		end = 0;
 		count = 0;
-		//write(1, "RES:\n", 5);
-		//pr(res);
+		write(1, "RES:\n", 5);
+		pr(res);
 	}
 }
 
