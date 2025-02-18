@@ -16,99 +16,56 @@
 #include <signal.h>
 #include <stdlib.h>
 
-volatile sig_atomic_t	wait_signal = 0;
+volatile sig_atomic_t	g_wait_signal = 0;
 
 void	pr(char *str);
-static int	ft_chackal(long n)
-{
-	int	i;
 
-	i = 0;
+void	ft_putnbr_fd(int n, int fd)
+{
+	if (n == -2147483648)
+	{
+		write(fd, "-2147483648", 11);
+		return ;
+	}
 	if (n < 0)
 	{
 		n *= -1;
-		i++;
+		write(fd, "-", 1);
 	}
-	while (n >= 10)
+	if (n > 9)
 	{
-		n /= 10;
-		i++;
+		ft_putnbr_fd(n / 10, fd);
+		ft_putnbr_fd(n % 10, fd);
 	}
-	i++;
-	return (i);
-}
-
-char	*ft_itoa(int nb)
-{
-	char	*res;
-	int		size;
-	long	n;
-	int		neg;
-
-	neg = 0;
-	n = nb;
-	size = ft_chackal(n);
-	if (n < 0)
+	else
 	{
-		n *= -1;
-		neg = 1;
-	}
-	res = malloc(size + 1);
-	if (!res)
-		return (NULL);
-	res[size] = '\0';
-	while (--size >= 0)
-	{
-		res[size] = n % 10 + 48;
-		n /= 10;
-		if (size == 0 && neg == 1)
-			res[size] = '-';
-	}
-	return (res);
-}
-
-void	xd(char*str)
-{
-	while (*str)
-		write(1, str++, 1);
-}
-
-void	flush(char *str)
-{
-	while (*str)
-	{
-		*str = '\0';
-		str++;
+		n += '0';
+		write(fd, &n, 1);
 	}
 }
 
-int	ft_strlen(char *str)
+void	set_null(int *a, int *b, char *c)
 {
-	int	i;
-
-	i = 0;
-	while (*str)
-	{
-		i++;
-		str++;
-	}
-	return (i);
+	*a = 0;
+	*b = 0;
+	*c = 0;
 }
-static void	print_signal(int signal, siginfo_t * info, void *context)
+
+static void	print_signal(int signal, siginfo_t *info, void *context)
 {
-	(void)context;
 	static char	res[1000000] = {0};	
 	static char	count = 0;
 	static int	i = 0;
 	static int	end = 0;
 
+	(void)context;
 	if (signal == SIGUSR1 && end != 2)
 	{
 		count++;
-		end = 0;	
+		end = 0;
 		kill(info->si_pid, SIGUSR1);
 	}
-	if(signal == SIGUSR2 && end != 2)
+	if (signal == SIGUSR2 && end != 2)
 	{
 		res[i] = count;
 		count = 0;
@@ -118,10 +75,7 @@ static void	print_signal(int signal, siginfo_t * info, void *context)
 	if (end == 2)
 	{
 		res[i] = '\0';
-		i = 0;
-		end = 0;
-		count = 0;
-		write(1, "RES:\n", 5);
+		set_null(&i, &end, &count);
 		pr(res);
 	}
 }
@@ -141,16 +95,18 @@ void	pr(char *str)
 
 int	main(void)
 {
-	struct sigaction sig;
-	int	ret = 0;
-	pid_t	pid;
+	struct sigaction	sig;
+	int					ret;
+	pid_t				pid;
+
+	ret = 0;
 	pid = getpid();
-	char *tmp = ft_itoa(pid);
-	pr(tmp);
+	ft_putnbr_fd(pid, 0);
+	write(1, "\n", 1);
 	sig.sa_sigaction = print_signal;
 	sigaction(SIGUSR1, &sig, NULL);
 	sigaction(SIGUSR2, &sig, NULL);
-	sig.sa_flags = SA_RESTART | SA_SIGINFO; 
+	sig.sa_flags = SA_RESTART | SA_SIGINFO;
 	while (1)
 	{
 		ret = pause();

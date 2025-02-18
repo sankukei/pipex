@@ -13,23 +13,19 @@
 NAME1 = server
 NAME2 = client
 
-COMP = cc
+all: client server
 
-FLAGS = -Wall -Wextra -Werror -g3 -I ./
+client:
+	gcc -o client client.c
 
-SRC =	server.c \
-	client.c \
-
-all:
-	${COMP} ${FLAGS} ${SRC}
+server:
+	gcc -o server server.c
 
 clean:
-	rm -f ${OBJS} 
+	rm -f client && rm -f server 
 
-fclean: clean;
-	rm -f server client
+fclean: clean
 
 re: fclean all
 		
 .PHONY: all, clean, fclean, re, bonus
-

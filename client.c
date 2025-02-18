@@ -15,7 +15,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
-volatile sig_atomic_t	wait_signal = 0;
+volatile sig_atomic_t	g_wait_signal = 0;
 
 static int	ft_chackal(long n)
 {
@@ -65,58 +65,45 @@ char	*ft_itoa(int nb)
 	return (res);
 }
 
-
-int	ft_strlen(char *str)
+void	handle_signal(int signal, siginfo_t *info, void *context)
 {
-	int	i;
-
-	i = 0;
-	while (str[i])
-		i++;
-	return (i);
+	(void)signal;
+	(void)info;
+	(void)context;
+	g_wait_signal = 1;
 }
 
-void	wow(int signal, siginfo_t * info, void *context)
+void	send_signal(int ms, int signal, int pid)
 {
-	signal = 0;
-	info = 0;
-	context = 0;
-	signal++;
-	info++;
-	context++;
-	wait_signal = 1;
+	usleep(ms);
+	kill(pid, signal);
 }
+
 int	main(int ac, char **av)
 {
-	int	i;
-	char	count;
-	
+	int					i;
+	char				count;
+	struct sigaction	sig;
+
+	if (ac != 3)
+		return (write(1, "error", 5));
 	i = 0;
-	struct sigaction sig;
-	sig.sa_sigaction = wow;
+	sig.sa_sigaction = handle_signal;
 	sig.sa_flags = 0;
 	sigaction(SIGUSR1, &sig, NULL);
-	if (ac == 3)
+	while (av[2][i])
 	{
-		while (av[2][i])
+		count = av[2][i];
+		while (count--)
 		{
-			count = av[2][i];
-			while (count--)
-			{
-				usleep(100);
-				wait_signal = 0;
-				kill(atoi(av[1]), SIGUSR1);
-				while (!wait_signal)
-					;
-			}
-			usleep(100);
-			kill(atoi(av[1]), SIGUSR2);\
-			i++;
+			g_wait_signal = 0;
+			send_signal(100, SIGUSR1, atoi(av[1]));
+			while (!g_wait_signal)
+				;
 		}
-		usleep(100);
-		kill(atoi(av[1]), SIGUSR2);
+		send_signal(100, SIGUSR2, atoi(av[1]));
+		i++;
 	}
-	else
-		write(1, "ERROR: Need 2 parameters (pid, string to send)", 46);
+	send_signal(100, SIGUSR2, atoi(av[1]));
 	return (0);
 }
